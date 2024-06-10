@@ -1,12 +1,17 @@
 import { createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
-import {
-  contentMessageUserAdd,
-  setMessageAction,
-  statusMessage,
-} from "./messageReducer";
+
 const initialState = {
   productList: [],
+  product: {
+    id: "",
+    name: "",
+    alias: "",
+    latitude: "",
+    longtitude: "",
+    description: "",
+    image: "",
+  },
 };
 
 const storeReducer = createSlice({
@@ -16,10 +21,19 @@ const storeReducer = createSlice({
     getStoreListAction: (state, action) => {
       state.productList = action.payload;
     },
+    updateProductAction: (state, action) => {
+      state.product.id = action.payload.id;
+      state.product.name = action.payload.name;
+      state.product.alias = action.payload.alias;
+      state.product.latitude = action.payload.latitude;
+      state.product.longtitude = action.payload.longtitude;
+      state.product.description = action.payload.description;
+      state.product.image = action.payload.image;
+    },
   },
 });
 
-export const { getStoreListAction } = storeReducer.actions;
+export const { getStoreListAction, updateProductAction } = storeReducer.actions;
 
 export default storeReducer.reducer;
 
@@ -44,19 +58,8 @@ export const addProductActionApi = (product) => {
       );
       const actionThunk = getProductListActionApi();
       dispatch(actionThunk);
-      const actionNotify = {
-        type: statusMessage.success,
-        content: contentMessageUserAdd.addUserSuccess,
-      };
-      const messageAction = setMessageAction(actionNotify);
-      dispatch(messageAction);
     } catch (err) {
-      const actionNotify = {
-        type: statusMessage.error,
-        content: contentMessageUserAdd.addUserFail,
-      };
-      const messageAction = setMessageAction(actionNotify);
-      dispatch(messageAction);
+      console.log(err);
     }
   };
 };
@@ -64,16 +67,49 @@ export const addProductActionApi = (product) => {
 // Xóa sản phẩm
 export const deleteProductActionApi = (id) => {
   return async (dispatch) => {
+    const arrID = [id];
     try {
+      console.log("arrID", arrID);
       const response = await axios.delete(
         "https://apistore.cybersoft.edu.vn/api/Store",
-        id
+        { data: arrID }
       );
       console.log(response);
       const actionThunk = getProductListActionApi();
       dispatch(actionThunk);
     } catch (err) {
       console.log("err", err);
+    }
+  };
+};
+
+// Get sản phẩm theo id
+export const getProductIdActionApi = (id) => {
+  return async (dispatch) => {
+    try {
+      const res = await axios.get(
+        `https://apistore.cybersoft.edu.vn/api/Store/getbyid?id=${id}`
+      );
+      const data = res.data.content;
+      dispatch(updateProductAction(data));
+    } catch (err) {
+      console.log("err", err);
+    }
+  };
+};
+
+// Update sản phẩm
+export const updateProdActionApi = (product) => {
+  return async (dispatch) => {
+    try {
+      const res = await axios.put(
+        `https://apistore.cybersoft.edu.vn/api/Store?id=${product.id}`,
+        product
+      );
+      const actionThunk = getProductListActionApi();
+      dispatch(actionThunk);
+    } catch (err) {
+      console.log(err);
     }
   };
 };

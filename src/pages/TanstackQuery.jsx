@@ -4,7 +4,6 @@ const TanstackQuery = () => {
   return (
     <div>
       <div>
-        {/* Modal trigger button */}
         <button
           type="button"
           className="btn btn-primary btn-lg"
@@ -13,8 +12,7 @@ const TanstackQuery = () => {
         >
           Launch
         </button>
-        {/* Modal Body */}
-        {/* if you want to close by clicking outside the modal, delete the last endpoint:data-bs-backdrop and data-bs-keyboard */}
+
         <div
           className="modal fade"
           id="modalId"
@@ -41,7 +39,49 @@ const TanstackQuery = () => {
                   aria-label="Close"
                 />
               </div>
-              <div className="modal-body">Body</div>
+              <div className="modal-body">
+                <form>
+                  <div className="mb-3">
+                    <label htmlFor className="form-label">
+                      Name
+                    </label>
+                    <input
+                      type="text"
+                      name="name"
+                      id="name"
+                      className="form-control"
+                      aria-describedby="helpId"
+                    />
+                  </div>
+                  <div className="mb-3">
+                    <label htmlFor className="form-label">
+                      Description
+                    </label>
+                    <input
+                      type="text"
+                      name="description"
+                      id="description"
+                      className="form-control"
+                      aria-describedby="helpId"
+                    />
+                  </div>
+                  <div className="mb-3">
+                    <label htmlFor className="form-label">
+                      Image
+                    </label>
+                    <input
+                      type="text"
+                      name="image"
+                      id="image"
+                      className="form-control"
+                      aria-describedby="helpId"
+                    />
+                  </div>
+                  <button type="submit" classname="btn btn-success ">
+                    Lấy value
+                  </button>
+                </form>
+              </div>
               <div className="modal-footer">
                 <button
                   type="button"
@@ -50,14 +90,10 @@ const TanstackQuery = () => {
                 >
                   Close
                 </button>
-                <button type="button" className="btn btn-primary">
-                  Save
-                </button>
               </div>
             </div>
           </div>
         </div>
-        {/* Optional: Place to the bottom of scripts */}
       </div>
     </div>
   );
