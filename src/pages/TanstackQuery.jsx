@@ -1,99 +1,81 @@
-import React from "react";
+import React, { useState } from "react";
+import ReactQueryCreateForm from "../components/ReactQueryCreateForm";
+import ReactQueryUpdateForm from "../components/ReactQueryUpdateForm";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { storeApi } from "../services/apiStore/storeApi";
 
 const TanstackQuery = () => {
+  const [selectedProductId, setSelectedProductId] = useState(null);
+  const handleEditClick = (id) => {
+    setSelectedProductId(id);
+  };
+  const { isLoading, isPending, data, error } = useQuery({
+    queryKey: ["storeListApi"],
+    queryFn: storeApi.getAll,
+    staleTime: 30 * 1000,
+    refetchOnWindowFocus: true,
+  });
+
+  const queryClient = useQueryClient();
+
+  const deleteProduct = useMutation({
+    mutationKey: ["delProductApi"],
+    mutationFn: storeApi.delProduct,
+    onSuccess: () => {
+      queryClient.invalidateQueries("storeListApi");
+    },
+  });
+
   return (
-    <div>
+    <div className="container">
+      <h3>Product list</h3>
       <div>
         <button
           type="button"
-          className="btn btn-primary btn-lg"
+          className="btn btn-dark btn-lg"
           data-bs-toggle="modal"
-          data-bs-target="#modalId"
+          data-bs-target="#reactQueryCreateForm"
         >
-          Launch
+          Add new product
         </button>
+        <ReactQueryCreateForm />
+      </div>
 
-        <div
-          className="modal fade"
-          id="modalId"
-          tabIndex={-1}
-          data-bs-backdrop="static"
-          data-bs-keyboard="false"
-          role="dialog"
-          aria-labelledby="modalTitleId"
-          aria-hidden="true"
-        >
-          <div
-            className="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-sm"
-            role="document"
-          >
-            <div className="modal-content">
-              <div className="modal-header">
-                <h5 className="modal-title" id="modalTitleId">
-                  Modal title
-                </h5>
-                <button
-                  type="button"
-                  className="btn-close"
-                  data-bs-dismiss="modal"
-                  aria-label="Close"
-                />
-              </div>
-              <div className="modal-body">
-                <form>
-                  <div className="mb-3">
-                    <label htmlFor className="form-label">
-                      Name
-                    </label>
-                    <input
-                      type="text"
-                      name="name"
-                      id="name"
-                      className="form-control"
-                      aria-describedby="helpId"
-                    />
+      <div className="row mt-4">
+        {isPending
+          ? "Loading....."
+          : data?.map((prod, index) => {
+              return (
+                <div className="col-3 mt-2" key={index}>
+                  <div className="card">
+                    <img src={prod.image} alt={prod.alias} />
+                    <div className="card-body">
+                      <h3>{prod.name}</h3>
+                      <p>{prod.description}</p>
+                      <button
+                        className="btn btn-dark"
+                        data-bs-toggle="modal"
+                        data-bs-target="#reactQueryUpdateForm"
+                        onClick={() => {
+                          handleEditClick(prod.id);
+                        }}
+                      >
+                        Edit
+                      </button>
+                      <ReactQueryUpdateForm productId={selectedProductId} />
+                      <button
+                        className="btn btn-danger ms-2"
+                        onClick={() => {
+                          deleteProduct.mutateAsync(prod.id);
+                        }}
+                      >
+                        Delete
+                      </button>
+                    </div>
                   </div>
-                  <div className="mb-3">
-                    <label htmlFor className="form-label">
-                      Description
-                    </label>
-                    <input
-                      type="text"
-                      name="description"
-                      id="description"
-                      className="form-control"
-                      aria-describedby="helpId"
-                    />
-                  </div>
-                  <div className="mb-3">
-                    <label htmlFor className="form-label">
-                      Image
-                    </label>
-                    <input
-                      type="text"
-                      name="image"
-                      id="image"
-                      className="form-control"
-                      aria-describedby="helpId"
-                    />
-                  </div>
-                  <button type="submit" classname="btn btn-success ">
-                    Lấy value
-                  </button>
-                </form>
-              </div>
-              <div className="modal-footer">
-                <button
-                  type="button"
-                  className="btn btn-secondary"
-                  data-bs-dismiss="modal"
-                >
-                  Close
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
+                </div>
+              );
+            })}
       </div>
     </div>
   );
